@@ -3,9 +3,15 @@ package sk.itsovy.android.hereiam;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
+import java.io.IOException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+
+import retrofit2.Call;
 import sk.itsovy.android.hereiam.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
@@ -26,9 +32,23 @@ public class MainActivity extends AppCompatActivity {
         binding.buttonRefresh.setOnClickListener(view -> refresh());
     }
 
-    private void refresh() {
+    private void login() {
+        String login = "Filip";
+        Executor e = Executors.newSingleThreadExecutor();
+        e.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Call<Void> call = RestDao.API.sendLogin(login);
+                    call.execute();
+                } catch (IOException exception) {
+                    Log.e(getClass().getName(), "Unable to send login.", exception);
+                }
+            }
+        });
+
     }
 
-    private void login() {
+    private void refresh() {
     }
 }

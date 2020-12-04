@@ -5,6 +5,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -20,6 +21,18 @@ import sk.itsovy.android.hereiam.databinding.ActivityMainBinding;
 public class MainActivity extends AppCompatActivity {
 
     private UsersViewModel viewModel;
+
+    private Handler periodicHandler = new Handler();
+    // delay 20 sekund
+    private int delay = 20 * 1000;
+    private Runnable periodicRefresh = new Runnable() {
+        @Override
+        public void run() {
+            viewModel.refresh();
+            periodicHandler.postDelayed(periodicRefresh, delay);
+        }
+    };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +58,18 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        periodicHandler.postDelayed(periodicRefresh, delay);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        periodicHandler.removeCallbacks(periodicRefresh);
     }
 
     private void login() {

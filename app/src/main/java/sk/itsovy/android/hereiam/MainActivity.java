@@ -1,6 +1,8 @@
 package sk.itsovy.android.hereiam;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -8,6 +10,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -15,6 +18,8 @@ import retrofit2.Call;
 import sk.itsovy.android.hereiam.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
+
+    private UsersViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +35,16 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         binding.buttonRefresh.setOnClickListener(view -> refresh());
+
+        ViewModelProvider provider = new ViewModelProvider(this);
+        viewModel = provider.get(UsersViewModel.class);
+        viewModel.getUsers().observe(this, new Observer<List<User>>() {
+            @Override
+            public void onChanged(List<User> users) {
+                binding.textViewUsers.setText(users.toString());
+            }
+        });
+
     }
 
     private void login() {
@@ -50,5 +65,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void refresh() {
+        viewModel.refresh();
     }
 }
